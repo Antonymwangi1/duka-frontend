@@ -24,7 +24,7 @@ import api from "@/lib/axios";
 const RegisterSchema = z.object({
   // Owner details
   fullname: z.string().min(2, "Full name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   phone: z
     .string()
     .regex(/^(\+254|0)[17]\d{8}$/, "Invalid Kenyan phone number"),
@@ -100,7 +100,7 @@ export default function RegisterPage() {
                 <Label htmlFor="fullname">Full Name</Label>
                 <Input
                   id="fullname"
-                  placeholder="John Kamau"
+                  placeholder="John Doe"
                   {...register("fullname")}
                 />
                 {errors.fullname && (
@@ -170,7 +170,7 @@ export default function RegisterPage() {
                 <Label htmlFor="shopName">Shop Name</Label>
                 <Input
                   id="shopName"
-                  placeholder="Kamau General Store"
+                  placeholder="John General Store"
                   {...register("shopName")}
                 />
                 {errors.shopName && (
@@ -185,7 +185,7 @@ export default function RegisterPage() {
                   <Label htmlFor="address">Location</Label>
                   <Input
                     id="address"
-                    placeholder="Thika Town"
+                    placeholder="Nairobi City"
                     {...register("address")}
                   />
                   {errors.address && (

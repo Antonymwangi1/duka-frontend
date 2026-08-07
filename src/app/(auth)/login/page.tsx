@@ -46,13 +46,25 @@ export default function LoginPage() {
       const response = await api.post("/api/v1/auth/login", data);
       const { accessToken, user, requiresShopSelection } = response.data;
 
-      setAuth(user, null, accessToken);
-
       if (requiresShopSelection) {
+        setAuth(user, null, accessToken);
         router.push("/select-shop");
-      } else {
-        router.push("/dashboard");
+        return;
       }
+
+      // Fetch shop details immediately after login
+      try {
+        const shopsResponse = await api.get("/api/v1/auth/shops", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const shops = shopsResponse.data.shops;
+        const shop = shops.length > 0 ? shops[0] : null;
+        setAuth(user, shop, accessToken);
+      } catch {
+        setAuth(user, null, accessToken);
+      }
+
+      router.push("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message ?? "Something went wrong");
     }

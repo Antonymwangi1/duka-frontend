@@ -1,8 +1,29 @@
+"use client"
+import { useAuthStore } from "@/store/auth.store";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const { isAuthenticated, _hasHydrated } = useAuthStore();
+
+  useEffect(() => {
+    if (!_hasHydrated) return;
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [_hasHydrated, isAuthenticated]);
+
+  // Don't render anything until hydration is complete
+  if (!_hasHydrated) return null;
+
+  // Don't render auth pages if already logged in
+  if (isAuthenticated) return null;
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left side — branding */}
@@ -17,24 +38,22 @@ export default function AuthLayout({
         <div className="space-y-6">
           <div className="bg-primary-foreground/10 rounded-2xl p-6">
             <p className="text-primary-foreground text-lg leading-relaxed">
-              "Duka has completely changed how I manage my shop. I can see my
-              profits every day without doing any calculations."
+              "Built specifically for Kenyan shops — track your stock, sales,
+              and profit from one simple dashboard."
             </p>
             <div className="mt-4">
-              <p className="text-primary-foreground font-semibold">
-                James Kamau
-              </p>
+              <p className="text-primary-foreground font-semibold">Duka</p>
               <p className="text-primary-foreground/70 text-sm">
-                Shop owner, Thika
+                Built for Kenyan businesses
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: "Shops", value: "500+" },
-              { label: "Daily Sales", value: "10k+" },
-              { label: "Uptime", value: "99.9%" },
+              { label: "Setup time", value: "5 minutes" },
+              { label: "M-Pesa", value: "✓" },
+              { label: "Free", value: "always" },
             ].map((stat) => (
               <div
                 key={stat.label}
