@@ -9,8 +9,6 @@ export function Header() {
   const { user, shop } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
 
-  console.log(shop?.shopName)
-
   return (
     <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between shrink-0">
       {/* Page context */}
