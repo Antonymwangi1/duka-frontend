@@ -26,6 +26,7 @@ export default function DashboardLayout({
   } = useAuthStore();
 
   const [isChecking, setIsChecking] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!_hasHydrated) return;
@@ -126,9 +127,12 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      <Sidebar />
+      <Sidebar
+        open={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Header />
+        <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>

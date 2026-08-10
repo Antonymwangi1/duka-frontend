@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 import {
@@ -12,11 +12,11 @@ import {
   Users,
   Store,
   LogOut,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import api from "@/lib/axios";
-import { useRouter } from "next/navigation";
 
 const navItems = [
   {
@@ -57,7 +57,12 @@ const navItems = [
   },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, shop, logout } = useAuthStore();
@@ -75,29 +80,41 @@ export function Sidebar() {
     (item) => user?.role && item.roles.includes(user.role),
   );
 
-  return (
-    <aside className="w-64 bg-card border-r border-border flex flex-col h-full shrink-0">
+  const sidebarContent = (
+    <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-primary">Duka</h1>
-        {shop && (
-          <p className="text-sm text-muted-foreground mt-1 truncate">
-            {shop.shopName}
-          </p>
-        )}
+      <div className="p-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-primary">Duka</h1>
+          {shop && (
+            <p className="text-sm text-muted-foreground mt-1 truncate max-w-[160px]">
+              {shop.shopName}
+            </p>
+          )}
+        </div>
+
+        {/* Close button — mobile only */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
+          onClick={onClose}
+        >
+          <X className="h-5 w-5" />
+        </Button>
       </div>
 
       <Separator />
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {filteredNav.map((item) => {
           const Icon = item.icon;
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + "/");
 
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={item.href} onClick={onClose}>
               <div
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg",
@@ -142,6 +159,35 @@ export function Sidebar() {
           Sign out
         </Button>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar — always visible */}
+      <aside className="hidden lg:flex w-64 bg-card border-r border-border flex-col h-full shrink-0">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile sidebar — drawer overlay */}
+      <div
+        className={cn(
+          "fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ease-out lg:hidden",
+          open ? "opacity-100" : "pointer-events-none opacity-0",
+        )}
+        onClick={onClose}
+        aria-hidden={!open}
+      />
+
+      <aside
+        className={cn(
+          "fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-border bg-card shadow-xl transition-transform duration-300 ease-out lg:hidden",
+          open ? "translate-x-0" : "-translate-x-full",
+        )}
+        aria-hidden={!open}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }
