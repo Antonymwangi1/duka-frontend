@@ -121,10 +121,17 @@ export default function ProductsPage() {
     let imported = 0;
     let failed = 0;
     for (const row of rows) {
-      try { await create.mutateAsync(row); imported += 1; }
-      catch { failed += 1; }
+      try {
+        await create.mutateAsync(row);
+        imported += 1;
+      } catch {
+        failed += 1;
+      }
     }
-    if (failed) setActionError(`${imported} imported, ${failed} failed. Check duplicate SKUs or barcodes.`);
+    if (failed)
+      setActionError(
+        `${imported} imported, ${failed} failed. Check duplicate SKUs or barcodes.`,
+      );
     return { imported, failed };
   };
 
@@ -154,7 +161,9 @@ export default function ProductsPage() {
             <Button variant="outline" onClick={() => setCategoriesOpen(true)}>
               Manage categories
             </Button>
-            <Button variant="outline" onClick={() => setCsvOpen(true)}>Import CSV</Button>
+            <Button variant="outline" onClick={() => setCsvOpen(true)}>
+              Import CSV
+            </Button>
             <Button onClick={openCreate}>
               <Plus /> Add product
             </Button>
@@ -275,7 +284,12 @@ export default function ProductsPage() {
         }
         error={actionError}
       />
-      <CsvImportDialog open={csvOpen} onOpenChange={setCsvOpen} onImport={handleCsvImport} isImporting={create.isPending} />
+      <CsvImportDialog
+        open={csvOpen}
+        onOpenChange={setCsvOpen}
+        onImport={handleCsvImport}
+        isImporting={create.isPending}
+      />
     </div>
   );
 }

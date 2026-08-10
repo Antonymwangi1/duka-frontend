@@ -170,7 +170,11 @@ export function ProductFormDialog({
                   No category
                 </option>
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id} className="bg-card">
+                  <option
+                    key={category.id}
+                    value={category.id}
+                    className="bg-card"
+                  >
                     {category.name}
                   </option>
                 ))}
