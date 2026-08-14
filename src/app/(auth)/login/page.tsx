@@ -64,7 +64,13 @@ export default function LoginPage() {
         setAuth(user, null, accessToken);
       }
 
-      router.push("/dashboard");
+      if (user.role === "CASHIER") {
+        router.push("/pos");
+      } else if (requiresShopSelection) {
+        router.push("/select-shop");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setError(err.response?.data?.message ?? "Something went wrong");
     }

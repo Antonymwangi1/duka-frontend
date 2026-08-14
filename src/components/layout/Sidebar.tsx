@@ -13,6 +13,7 @@ import {
   Store,
   LogOut,
   X,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -20,10 +21,16 @@ import api from "@/lib/axios";
 
 const navItems = [
   {
+    label: "POS",
+    href: "/pos",
+    icon: ShoppingCart,
+    roles: ["OWNER", "ADMIN", "CASHIER"],
+  },
+  {
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["OWNER", "ADMIN", "CASHIER"],
+    roles: ["OWNER", "ADMIN"],
   },
   {
     label: "Products",
@@ -34,8 +41,8 @@ const navItems = [
   {
     label: "Sales",
     href: "/sales",
-    icon: ShoppingCart,
-    roles: ["OWNER", "ADMIN", "CASHIER"],
+    icon: ClipboardList,
+    roles: ["OWNER", "ADMIN"],
   },
   {
     label: "Reports",
