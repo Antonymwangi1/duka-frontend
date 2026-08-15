@@ -221,7 +221,6 @@ export default function ProductsPage() {
       ) : (
         <ProductsTable
           products={products}
-          currency={shop?.currency ?? "KES"}
           isLoading={productsQuery.isLoading}
           canManage={canManage}
           isOwner={user?.role === "OWNER"}

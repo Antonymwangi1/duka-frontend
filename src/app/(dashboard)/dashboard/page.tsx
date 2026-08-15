@@ -19,6 +19,7 @@ import {
   useTopProducts,
 } from "@/hooks/useDashboard";
 import { useAuthStore as useAuth } from "@/store/auth.store";
+import { useCurrency } from "@/hooks/useCurrency";
 
 function StatsSkeleton() {
   return (
@@ -44,14 +45,9 @@ export default function DashboardPage() {
   const { data: lowStock } = useLowStockProducts();
   const { data: topProducts } = useTopProducts();
 
-  const currency = shop?.currency ?? "KES";
   const isLoading = summaryLoading || profitLoading;
 
-  const formatMoney = (amount: number) =>
-    `${currency} ${amount.toLocaleString("en-KE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
+  const { money } = useCurrency()
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -99,7 +95,7 @@ export default function DashboardPage() {
           />
           <StatsCard
             title="Today's Revenue"
-            value={formatMoney(summary?.totalRevenue ?? 0)}
+            value={money(summary?.totalRevenue ?? 0)}
             subtitle={`${
               summary?.totalDiscount > 0
                 ? `KES ${summary.totalDiscount} discounted`
@@ -110,7 +106,7 @@ export default function DashboardPage() {
           />
           <StatsCard
             title="Gross Profit"
-            value={formatMoney(profit?.grossProfit ?? 0)}
+            value={money(profit?.grossProfit ?? 0)}
             subtitle={`${profit?.profitMargin ?? 0}% margin`}
             icon={TrendingUp}
             color="accent"
@@ -144,7 +140,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold">
-                    {formatMoney(summary.paymentMethods.cash.revenue)}
+                    {money(summary.paymentMethods.cash.revenue)}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {summary.paymentMethods.cash.count} transactions
@@ -159,7 +155,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold">
-                    {formatMoney(summary.paymentMethods.mpesa.revenue)}
+                    {money(summary.paymentMethods.mpesa.revenue)}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {summary.paymentMethods.mpesa.count} transactions
@@ -170,7 +166,7 @@ export default function DashboardPage() {
               <div className="border-t border-border pt-3 flex justify-between">
                 <span className="text-sm font-medium">Total</span>
                 <span className="text-sm font-bold">
-                  {formatMoney(summary.totalRevenue)}
+                  {money(summary.totalRevenue)}
                 </span>
               </div>
             </CardContent>
@@ -209,7 +205,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <p className="text-sm font-semibold text-accent">
-                        {formatMoney(product.revenue)}
+                        {money(product.revenue)}
                       </p>
                     </div>
                   ))}

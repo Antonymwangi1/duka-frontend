@@ -115,3 +115,19 @@
 button {
   cursor: pointer;
 }
+
+@media print {
+  @page {
+    margin: 10mm;
+    size: 80mm auto;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+}

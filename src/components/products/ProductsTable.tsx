@@ -14,10 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Product } from "@/types";
+import { useCurrency } from "@/hooks/useCurrency";
 
 type ProductsTableProps = {
   products: Product[];
-  currency: string;
   isLoading: boolean;
   canManage: boolean;
   isOwner: boolean;
@@ -28,7 +28,6 @@ type ProductsTableProps = {
 
 export function ProductsTable({
   products,
-  currency,
   isLoading,
   canManage,
   isOwner,
@@ -36,8 +35,7 @@ export function ProductsTable({
   onDelete,
   onAdjustStock,
 }: ProductsTableProps) {
-  const money = (value: number) =>
-    `${currency} ${Number(value).toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const { money } = useCurrency()
 
   if (isLoading)
     return (
