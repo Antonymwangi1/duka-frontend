@@ -13,8 +13,15 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useDailySummary } from "@/hooks/useDashboard";
+import { useCurrency } from "@/hooks/useCurrency";
 
 export default function SalesPage() {
+  const { data: summary, isLoading: summaryLoading } = useDailySummary();
+  console.log(summary);
+
+  const { money } = useCurrency();
+
   return (
     <div className="space-y-8 p-4 md:p-6 max-w-7xl mx-auto">
       {/* Header Section */}
@@ -62,7 +69,7 @@ export default function SalesPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$0.00</div>
+            <div className="text-2xl font-bold">{money(summary?.totalRevenue ?? 0)}</div>
             <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
               <span className="text-emerald-600 font-medium flex items-center">
                 <ArrowUpRight className="h-3 w-3" /> +0%
@@ -83,7 +90,7 @@ export default function SalesPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{summary?.totalSales ?? 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
               Ready to process checkout
             </p>
@@ -119,7 +126,7 @@ export default function SalesPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{summary?.totalItems || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">Units today</p>
           </CardContent>
         </Card>
