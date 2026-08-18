@@ -72,8 +72,8 @@ export function Cart({
       });
 
       // Invalidate relevant caches
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["reports"] });
+      await queryClient.invalidateQueries({ queryKey: ["reports"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
 
       // Clear cart
       onClear();
