@@ -21,7 +21,6 @@ import { CartItemType } from "@/components/pos/CartItem";
 import { Product } from "@/types";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useProducts } from "@/hooks/useProducts";
-import { useAuthStore } from "@/store/auth.store";
 import { useCurrency } from "@/hooks/useCurrency";
 
 export default function NewSalePage() {

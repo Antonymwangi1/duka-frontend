@@ -3,6 +3,7 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/types";
+import { useCurrency } from "@/hooks/useCurrency";
 
 export interface CartItemType {
   product: Product;
@@ -14,7 +15,6 @@ interface CartItemProps {
   onIncrease: (productId: string) => void;
   onDecrease: (productId: string) => void;
   onRemove: (productId: string) => void;
-  currency: string;
 }
 
 export function CartItem({
@@ -22,9 +22,9 @@ export function CartItem({
   onIncrease,
   onDecrease,
   onRemove,
-  currency,
 }: CartItemProps) {
   const subtotal = Number(item.product.sellingPrice) * item.quantity;
+  const { money } = useCurrency();
 
   return (
     <div className="flex items-center gap-3 py-3 border-b border-border last:border-0">
@@ -32,7 +32,7 @@ export function CartItem({
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{item.product.name}</p>
         <p className="text-xs text-muted-foreground">
-          {currency} {Number(item.product.sellingPrice).toLocaleString()} each
+          {money(item.product.sellingPrice)} each
         </p>
       </div>
 
@@ -64,9 +64,7 @@ export function CartItem({
 
       {/* Subtotal */}
       <div className="text-right shrink-0 w-20">
-        <p className="text-sm font-semibold">
-          {currency} {subtotal.toLocaleString()}
-        </p>
+        <p className="text-sm font-semibold">{money(subtotal)}</p>
       </div>
 
       {/* Remove */}

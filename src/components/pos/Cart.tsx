@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/select";
 import { CartItem, CartItemType } from "./CartItem";
 import api from "@/lib/axios";
-import { useAuthStore } from "@/store/auth.store";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface CartProps {
   items: CartItemType[];
@@ -36,9 +36,8 @@ export function Cart({
   onClear,
 }: CartProps) {
   const router = useRouter();
-  const { shop } = useAuthStore();
   const queryClient = useQueryClient();
-  const currency = shop?.currency ?? "KES";
+  const { money } = useCurrency();
 
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "MPESA">("CASH");
   const [discount, setDiscount] = useState<number>(0);
@@ -72,8 +71,14 @@ export function Cart({
       });
 
       // Invalidate relevant caches
-      await queryClient.invalidateQueries({ queryKey: ["reports"], exact: false });
-      await queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
+      await queryClient.invalidateQueries({
+        queryKey: ["reports"],
+        exact: false,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["products"],
+        exact: false,
+      });
 
       // Clear cart
       onClear();
@@ -133,7 +138,6 @@ export function Cart({
             onIncrease={onIncrease}
             onDecrease={onDecrease}
             onRemove={onRemove}
-            currency={currency}
           />
         ))}
       </div>
@@ -191,22 +195,18 @@ export function Cart({
           <div className="flex justify-between text-muted-foreground">
             <span>Subtotal</span>
             <span>
-              {currency} {subtotal.toLocaleString()}
+              {money(subtotal)}
             </span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-accent">
               <span>Discount ({discount}%)</span>
-              <span>
-                - {currency} {discountAmount.toLocaleString()}
-              </span>
+              <span>- {money(discountAmount)}</span>
             </div>
           )}
           <div className="flex justify-between font-bold text-base pt-1">
             <span>Total</span>
-            <span className="text-primary">
-              {currency} {total.toLocaleString()}
-            </span>
+            <span className="text-primary">{money(total)}</span>
           </div>
         </div>
 
@@ -230,7 +230,7 @@ export function Cart({
               Processing...
             </>
           ) : (
-            `Charge ${currency} ${total.toLocaleString()}`
+            `Charge ${money(total)}`
           )}
         </Button>
       </div>

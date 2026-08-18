@@ -46,7 +46,8 @@ export default function DashboardPage() {
   const { data: topProducts } = useTopProducts();
 
   const isLoading = summaryLoading || profitLoading;
-  console.log(summary)
+
+  console.log("Dashboard data:", { summary, profit, lowStock, topProducts });
 
   const { money } = useCurrency()
 
