@@ -22,6 +22,7 @@ import { Product } from "@/types";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useProducts } from "@/hooks/useProducts";
 import { useCurrency } from "@/hooks/useCurrency";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function NewSalePage() {
   const [cartItems, setCartItems] = useState<CartItemType[]>([]);
@@ -30,6 +31,9 @@ export default function NewSalePage() {
   const [page, setPage] = useState(1);
 
   const { money } = useCurrency();
+
+  const {shop} = useAuthStore()
+  console.log(shop?.shopName)
 
   const debounceSearch = useDebounce(searchQuery, 300);
 

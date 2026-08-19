@@ -32,7 +32,7 @@ export default function DashboardLayout({
     if (!_hasHydrated) return;
 
     const initAuth = async () => {
-      // Not authenticated at all
+      // 1. Check basic authentication
       if (!isAuthenticated) {
         router.push("/login");
         return;
@@ -40,7 +40,7 @@ export default function DashboardLayout({
 
       let currentToken = accessToken;
 
-      // No token in memory page was reloaded, refresh first
+      // 2. Refresh token if missing from memory on page reload
       if (!currentToken) {
         try {
           const response = await api.post("/api/v1/auth/refresh");
@@ -53,14 +53,37 @@ export default function DashboardLayout({
         }
       }
 
-      // Token confirmed now ensure shop is loaded
+      // Extract user role from store or JWT payload
+      const userRole = user?.role;
+
+      // -------------------------------------------------------------
+      // PATH A: CASHIER / STAFF FLOW
+      // -------------------------------------------------------------
+      // if (userRole === "CASHIER" || userRole === "ADMIN") {
+      //   // Cashier/Staff are permanently assigned to one shop via user.shopId
+      //   if (!shop && user?.shopId) {
+      //     // If shop object is missing in state, fetch current shop or construct fallback
+      //     try {
+      //       const response = await api.get("/api/v1/auth/shops/me");
+      //       setShop(response.data.shop);
+      //     } catch {
+      //       // Fallback minimal shop context so queries can fire
+      //       setShop({ id: user.shopId, name: "Store" } as any);
+      //     }
+      //   }
+      //   setIsChecking(false);
+      //   return;
+      // }
+
+      // -------------------------------------------------------------
+      // PATH B: OWNER FLOW
+      // -------------------------------------------------------------
       if (!shop) {
         try {
           const response = await api.get("/api/v1/auth/shops");
           const shops = response.data.shops;
 
-          if (shops.length === 0) {
-            // Owner has no shops somehow
+          if (!shops || shops.length === 0) {
             router.push("/login");
             return;
           }
@@ -68,39 +91,34 @@ export default function DashboardLayout({
           if (shops.length === 1) {
             setShop(shops[0]);
 
-            // Get fresh jWT with shopId populated
+            // Get fresh JWT with shopId populated
             const switchResponse = await api.post("/api/v1/auth/switch-shop", {
               shopId: shops[0].id,
             });
 
             setToken(switchResponse.data.accessToken);
           } else {
-            // Multiple shops needs selection
             router.push("/select-shop");
             return;
           }
         } catch {
-          // Not critical continue without shop
-          // but queries will be disabled
+          // Error loading owner shops
         }
       } else {
-        // shop exists but check if JWT has shopId
-        // Parse JWT payload to check
+        // Check if current JWT contains shopId claim
         try {
           const payload = JSON.parse(atob(currentToken!.split(".")[1]));
           if (!payload.shopId) {
-            // JWT missing shopId get fresh one
             const switchResponse = await api.post("/api/v1/auth/switch-shop", {
               shopId: shop.id,
             });
             setToken(switchResponse.data.accessToken);
           }
         } catch {
-          // Could not parse JWT continue
+          // Could not parse JWT
         }
       }
 
-      // Everything confirmed render dashboard
       setIsChecking(false);
     };
 
@@ -127,10 +145,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      <Sidebar
-        open={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
+      <Sidebar open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
