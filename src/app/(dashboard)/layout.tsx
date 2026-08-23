@@ -59,21 +59,21 @@ export default function DashboardLayout({
       // -------------------------------------------------------------
       // PATH A: CASHIER / STAFF FLOW
       // -------------------------------------------------------------
-      // if (userRole === "CASHIER" || userRole === "ADMIN") {
-      //   // Cashier/Staff are permanently assigned to one shop via user.shopId
-      //   if (!shop && user?.shopId) {
-      //     // If shop object is missing in state, fetch current shop or construct fallback
-      //     try {
-      //       const response = await api.get("/api/v1/auth/shops/me");
-      //       setShop(response.data.shop);
-      //     } catch {
-      //       // Fallback minimal shop context so queries can fire
-      //       setShop({ id: user.shopId, name: "Store" } as any);
-      //     }
-      //   }
-      //   setIsChecking(false);
-      //   return;
-      // }
+      if (userRole === "CASHIER" || userRole === "ADMIN") {
+        // Cashier/Staff are permanently assigned to one shop via user.shopId
+        if (!shop && user?.shopId) {
+          // If shop object is missing in state, fetch current shop or construct fallback
+          try {
+            const response = await api.get("/api/v1/auth/shops");
+            setShop(response.data.shop);
+          } catch {
+            // Fallback minimal shop context so queries can fire
+            setShop({ id: user.shopId, name: "Store" } as any);
+          }
+        }
+        setIsChecking(false);
+        return;
+      }
 
       // -------------------------------------------------------------
       // PATH B: OWNER FLOW

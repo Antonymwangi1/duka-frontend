@@ -20,6 +20,8 @@ import {
 } from "@/hooks/useDashboard";
 import { useAuthStore as useAuth } from "@/store/auth.store";
 import { useCurrency } from "@/hooks/useCurrency";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 function StatsSkeleton() {
   return (
@@ -38,7 +40,18 @@ function StatsSkeleton() {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user, shop } = useAuthStore();
+
+  // Redirect cashiers away from dashboard
+  useEffect(() => {
+    if (user?.role == "CASHIER") {
+      router.replace("/pos");
+    }
+  }, [user]);
+
+  // don't render for cashiers
+  if (user?.role == "CASHIER") return null;
 
   const { data: summary, isLoading: summaryLoading } = useDailySummary();
   const { data: profit, isLoading: profitLoading } = useDailyProfit();
@@ -47,7 +60,7 @@ export default function DashboardPage() {
 
   const isLoading = summaryLoading || profitLoading;
 
-  const { money } = useCurrency()
+  const { money } = useCurrency();
 
   const greeting = () => {
     const hour = new Date().getHours();

@@ -44,39 +44,28 @@ export default function LoginPage() {
     try {
       setError(null);
       const response = await api.post("/api/v1/auth/login", data);
-      const { accessToken, user, shop, requiresShopSelection } = response.data;
+      const { accessToken, user, requiresShopSelection } = response.data;
 
-      // cashier flow
-      if (user.role === "CASHIER" || user.role === "STAFF") {
-        // Construct minimal shop context from user.shopId or backend response
-        const cashierShop =
-          shop || (user.shopId ? { id: user.shopId, name: "Store" } : null);
-
-        setAuth(user, cashierShop, accessToken);
-        router.push("/pos");
-        return;
-      }
-
-      // owner flow with shop selelction
-      if (requiresShopSelection) {
-        setAuth(user, null, accessToken);
-        router.push("/select-shop");
-        return;
-      }
-
-      // owner flow
+      // Fetch shop details
       try {
         const shopsResponse = await api.get("/api/v1/auth/shops", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const shops = shopsResponse.data.shops;
-        const activeShop = shops.length > 0 ? shops[0] : null;
-        setAuth(user, activeShop, accessToken);
+        const shop = shops.length > 0 ? shops[0] : null;
+        setAuth(user, shop, accessToken);
       } catch {
         setAuth(user, null, accessToken);
       }
 
-      router.push("/dashboard");
+      // Redirect based on role
+      if (requiresShopSelection) {
+        router.push("/select-shop");
+      } else if (user.role == "CASHIER") {
+        router.push("/pos");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setError(err.response?.data?.message ?? "Something went wrong");
     }
