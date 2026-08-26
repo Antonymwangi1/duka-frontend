@@ -3,7 +3,7 @@ import api from "@/lib/axios";
 import { useAuthStore } from "@/store/auth.store";
 import type { Pagination } from "@/types";
 
-export type StaffRole = "OWNER" | "ADMIN" | "CASHIER";
+export type StaffRole = "ADMIN" | "CASHIER";
 
 export interface StaffMember {
   id: string;
@@ -12,10 +12,8 @@ export interface StaffMember {
   email: string;
   role: StaffRole;
   shopId: string;
-  shopName: string;
   isActive: boolean;
-  password: string;
-  createdAth?: string;
+  createdAt?: string;
 }
 
 export type StaffInput = {
@@ -23,9 +21,9 @@ export type StaffInput = {
   email: string;
   phone: string;
   role: StaffRole;
-  password: string;
+  password?: string;
   shopId?: string;
-  isActive?: string;
+  isActive?: boolean;
 };
 
 type StaffResponse = {
@@ -68,7 +66,15 @@ export function useStaffMutations() {
 
   const create = useMutation({
     mutationFn: async (data: StaffInput) => {
-      const response = await api.post("/api/v1/auth/staff", data);
+      // Strip out fields backend does not expect
+      const payload = {
+        fullname: data.fullname,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+        password: data.password,
+      };
+      const response = await api.post("/api/v1/auth/staff", payload);
       return response.data.staff as StaffMember;
     },
     onSuccess: refreshStaff,

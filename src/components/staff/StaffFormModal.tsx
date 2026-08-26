@@ -49,12 +49,13 @@ export function StaffFormModal({
       setEmail(editingStaff.email);
       setPhone(editingStaff.phone);
       setRole(editingStaff.role);
-      setPassword(editingStaff.password);
+      setPassword(""); // ← never set password from existing staff
     } else {
       setFullname("");
       setEmail("");
       setPhone("");
       setRole("CASHIER");
+      setPassword("");
     }
   }, [editingStaff, isOpen]);
 
@@ -68,7 +69,6 @@ export function StaffFormModal({
       phone,
       role,
       password,
-      shopId: shop.id,
     });
   };
 
@@ -155,7 +155,6 @@ export function StaffFormModal({
                 <SelectContent>
                   <SelectItem value="CASHIER">Cashier</SelectItem>
                   <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="OWNER">Owner</SelectItem>
                 </SelectContent>
               </Select>
             </div>

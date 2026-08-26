@@ -62,7 +62,7 @@ export function useReports() {
 
   const isOwner = user?.role === "OWNER";
 
-  // 1. Sales Summary
+  // Sales Summary
   const summaryQuery = useQuery({
     queryKey: ["reports", "summary", shop?.id, queryParams],
     queryFn: async (): Promise<SalesSummary> => {
@@ -74,7 +74,7 @@ export function useReports() {
     enabled: !!shop?.id,
   });
 
-  // 2. Profit Report
+  // Profit Report
   const profitQuery = useQuery({
     queryKey: ["reports", "profit", shop?.id, queryParams],
     queryFn: async (): Promise<ProfitReport> => {
@@ -86,7 +86,7 @@ export function useReports() {
     enabled: !!shop?.id,
   });
 
-  // 3. Top Products
+  // Top Products
   const topProductsQuery = useQuery({
     queryKey: ["reports", "top-products", shop?.id, queryParams],
     queryFn: async (): Promise<TopProduct[]> => {
@@ -98,7 +98,7 @@ export function useReports() {
     enabled: !!shop?.id,
   });
 
-  // 4. Staff Performance (Owner Only)
+  // Staff Performance (Owner Only)
   const staffQuery = useQuery({
     queryKey: ["reports", "staff", shop?.id, queryParams],
     queryFn: async (): Promise<StaffPerformance[]> => {
