@@ -40,9 +40,11 @@ const RegisterSchema = z.object({
   shopPhone: z
     .string()
     .regex(/^(\+254|0)[17]\d{8}$/, "Invalid Kenyan phone number"),
+  currency: z.enum(["KES", "USD"]).default("KES"),
 });
 
-type RegisterInput = z.infer<typeof RegisterSchema>;
+type RegisterInput = z.input<typeof RegisterSchema>;
+type RegisterOutput = z.output<typeof RegisterSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -53,7 +55,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterInput>({
+  } = useForm<RegisterInput, any, RegisterOutput>({
     resolver: zodResolver(RegisterSchema),
   });
 
@@ -62,7 +64,6 @@ export default function RegisterPage() {
       setError(null);
       const response = await api.post("/api/v1/auth/register", {
         ...data,
-        currency: "KES",
       });
 
       const { accessToken, user, shop } = response.data;
