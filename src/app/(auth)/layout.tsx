@@ -1,7 +1,9 @@
-"use client"
+"use client";
+
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Store } from "lucide-react";
 
 export default function AuthLayout({
   children,
@@ -16,77 +18,36 @@ export default function AuthLayout({
     if (isAuthenticated) {
       router.push("/dashboard");
     }
-  }, [_hasHydrated, isAuthenticated]);
+  }, [_hasHydrated, isAuthenticated, router]);
 
-  // Don't render anything until hydration is complete
-  if (!_hasHydrated) return null;
-
-  // Don't render auth pages if already logged in
-  if (isAuthenticated) return null;
+  if (!_hasHydrated || isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left side — branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12">
-        <div>
-          <h1 className="text-4xl font-bold text-primary-foreground">Duka</h1>
-          <p className="text-primary-foreground/70 mt-2 text-lg">
-            Shop Management System
-          </p>
+    
+    <div className="min-h-screen w-full bg-zinc-50/60 dark:bg-zinc-950 flex flex-col justify-between p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <header className="w-full max-w-7xl mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="bg-primary text-primary-foreground p-2 rounded-xl flex items-center justify-center shadow-xs">
+            <Store className="h-5 w-5" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            Duka
+          </span>
         </div>
+      </header>
 
-        <div className="space-y-6">
-          <div className="bg-primary-foreground/10 rounded-2xl p-6">
-            <p className="text-primary-foreground text-lg leading-relaxed">
-              "Built specifically for Kenyan shops — track your stock, sales,
-              and profit from one simple dashboard."
-            </p>
-            <div className="mt-4">
-              <p className="text-primary-foreground font-semibold">Duka</p>
-              <p className="text-primary-foreground/70 text-sm">
-                Built for Kenyan businesses
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { label: "Setup time", value: "5 minutes" },
-              { label: "M-Pesa", value: "✓" },
-              { label: "Free", value: "always" },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="bg-primary-foreground/10 rounded-xl p-4 text-center"
-              >
-                <p className="text-primary-foreground text-2xl font-bold">
-                  {stat.value}
-                </p>
-                <p className="text-primary-foreground/70 text-sm">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <p className="text-primary-foreground/50 text-sm">
-          © 2026 Duka. Built for Kenyan businesses.
-        </p>
-      </div>
-
-      {/* Right side — auth form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary">Duka</h1>
-            <p className="text-muted-foreground mt-1">Shop Management System</p>
-          </div>
-
+      {/* Main Container */}
+      <main className="flex-1 flex items-center justify-center py-10">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl shadow-xs p-6 sm:p-8 space-y-6">
           {children}
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full text-center text-xs text-zinc-400 dark:text-zinc-500">
+        <p>© 2026 Duka. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

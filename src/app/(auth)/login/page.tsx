@@ -6,22 +6,15 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { useAuthStore } from "@/store/auth.store";
 import api from "@/lib/axios";
 
 const LoginSchema = z.object({
-  email: z.email("Invalid email address"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -31,6 +24,7 @@ export default function LoginPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -61,81 +55,128 @@ export default function LoginPage() {
       // Redirect based on role
       if (requiresShopSelection) {
         router.push("/select-shop");
-      } else if (user.role == "CASHIER") {
+      } else if (user.role === "CASHIER") {
         router.push("/pos");
       } else {
         router.push("/dashboard");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message ?? "Something went wrong");
+      setError(err.response?.data?.message ?? "Invalid email or password");
     }
   };
 
   return (
-    <Card className="border-border shadow-sm">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-        <CardDescription>Sign in to your Duka account</CardDescription>
-      </CardHeader>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="space-y-1.5 text-center sm:text-left">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          Welcome back
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Enter your credentials to access your store
+        </p>
+      </div>
 
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && (
-            <div className="bg-destructive/10 text-destructive text-sm rounded-lg px-4 py-3">
-              {error}
-            </div>
-          )}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Global Error Alert */}
+        {error && (
+          <div className="flex items-center gap-2.5 bg-destructive/10 text-destructive border border-destructive/20 text-sm rounded-xl p-3.5 transition-all animate-in fade-in slide-in-from-top-1">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <p className="font-medium">{error}</p>
+          </div>
+        )}
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+        {/* Email Input */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="email"
+            className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+          >
+            Email Address
+          </Label>
+          <div className="relative">
+            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder="name@example.com"
+              className="pl-10 h-11 rounded-xl transition-all focus-visible:ring-2 focus-visible:ring-primary/20"
               {...register("email")}
             />
-            {errors.email && (
-              <p className="text-destructive text-sm">{errors.email.message}</p>
-            )}
           </div>
+          {errors.email && (
+            <p className="text-destructive text-xs font-medium pl-1 animate-in fade-in">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+        {/* Password Input */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label
+              htmlFor="password"
+              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+            >
+              Password
+            </Label>
+          </div>
+          <div className="relative">
+            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
+              className="pl-10 pr-10 h-11 rounded-xl transition-all focus-visible:ring-2 focus-visible:ring-primary/20"
               {...register("password")}
             />
-            {errors.password && (
-              <p className="text-destructive text-sm">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              "Sign in"
-            )}
-          </Button>
-
-          <p className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="text-primary font-medium hover:underline"
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+              tabIndex={-1}
             >
-              Create one
-            </Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="text-destructive text-xs font-medium pl-1 animate-in fade-in">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          className="w-full h-11 rounded-xl font-semibold shadow-xs transition-all hover:opacity-95 active:scale-[0.99] mt-2"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Authenticating...</span>
+            </div>
+          ) : (
+            "Sign In"
+          )}
+        </Button>
+
+        {/* Register Redirect */}
+        <div className="pt-2 text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/register"
+            className="text-primary font-semibold hover:underline underline-offset-4 transition-all"
+          >
+            Create store
+          </Link>
+        </div>
+      </form>
+    </div>
   );
 }

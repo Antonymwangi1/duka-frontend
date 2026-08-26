@@ -18,7 +18,6 @@ import {
   useLowStockProducts,
   useTopProducts,
 } from "@/hooks/useDashboard";
-import { useAuthStore as useAuth } from "@/store/auth.store";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
