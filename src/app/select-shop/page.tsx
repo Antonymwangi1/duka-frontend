@@ -49,9 +49,17 @@ export default function SelectShopPage() {
       const response = await api.post("/api/v1/auth/switch-shop", { shopId });
       const { accessToken, shop } = response.data;
 
+      // Store both token and shop
       setToken(accessToken);
       setShop(shop);
-      router.push("/dashboard");
+
+      // Get user role to redirect correctly
+      const { user } = useAuthStore.getState();
+      if (user?.role === "CASHIER") {
+        router.push("/pos");
+      } else {
+        router.push("/dashboard");
+      }
     } catch {
       setSelecting(null);
     }

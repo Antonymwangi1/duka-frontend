@@ -11,7 +11,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated, _hasHydrated } = useAuthStore();
+  const { isAuthenticated, _hasHydrated, user } = useAuthStore();
 
   useEffect(() => {
     if (!_hasHydrated) return;
@@ -20,10 +20,10 @@ export default function AuthLayout({
     }
   }, [_hasHydrated, isAuthenticated, router]);
 
-  if (!_hasHydrated || isAuthenticated) return null;
+  if (!_hasHydrated) return null;
+  if (isAuthenticated && user) return null;
 
   return (
-    
     <div className="min-h-screen w-full bg-zinc-50/60 dark:bg-zinc-950 flex flex-col justify-between p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <header className="w-full max-w-7xl mx-auto flex items-center justify-between">

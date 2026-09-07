@@ -25,6 +25,7 @@ interface AuthState {
 
   setAuth: (user: User, shop: Shop | null, token: string) => void;
   setShop: (shop: Shop) => void;
+  clearShop: () => void;
   setToken: (token: string) => void;
   logout: () => void;
   setHasHydrated: (value: boolean) => void;
@@ -48,15 +49,21 @@ export const useAuthStore = create<AuthState>()(
         }),
 
       setShop: (shop) => set({ shop }),
+      clearShop: () => set({ shop: null }),
       setToken: (token) => set({ accessToken: token }),
 
-      logout: () =>
+      logout: () => {
+        // Clear localStorage completely
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("duka-auth");
+        }
         set({
           user: null,
           shop: null,
           accessToken: null,
           isAuthenticated: false,
-        }),
+        });
+      },
 
       setHasHydrated: (value) => set({ _hasHydrated: value }),
     }),

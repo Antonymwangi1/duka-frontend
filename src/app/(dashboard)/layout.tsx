@@ -21,6 +21,7 @@ export default function DashboardLayout({
     _hasHydrated,
     setToken,
     setShop,
+    clearShop,
     logout,
     user,
   } = useAuthStore();
@@ -32,7 +33,6 @@ export default function DashboardLayout({
     if (!_hasHydrated) return;
 
     const initAuth = async () => {
-      // 1. Check basic authentication
       if (!isAuthenticated) {
         router.push("/login");
         return;
@@ -40,7 +40,7 @@ export default function DashboardLayout({
 
       let currentToken = accessToken;
 
-      // 2. Refresh token if missing from memory on page reload
+      // No token in memory — page was reloaded, refresh first
       if (!currentToken) {
         try {
           const response = await api.post("/api/v1/auth/refresh");
@@ -53,70 +53,62 @@ export default function DashboardLayout({
         }
       }
 
-      // Extract user role from store or JWT payload
-      const userRole = user?.role;
+      // Parse JWT to check shopId
+      let jwtShopId: string | null = null;
+      try {
+        const payload = JSON.parse(atob(currentToken!.split(".")[1]));
+        jwtShopId = payload.shopId ?? null;
+      } catch {}
 
-      // -------------------------------------------------------------
-      // PATH A: CASHIER / STAFF FLOW
-      // -------------------------------------------------------------
-      if (userRole === "CASHIER" || userRole === "ADMIN") {
-        // Cashier/Staff are permanently assigned to one shop via user.shopId
-        if (!shop && user?.shopId) {
-          // If shop object is missing in state, fetch current shop or construct fallback
-          try {
-            const response = await api.get("/api/v1/auth/shops");
-            setShop(response.data.shop);
-          } catch {
-            // Fallback minimal shop context so queries can fire
-            setShop({ id: user.shopId, name: "Store" } as any);
-          }
-        }
+      // JWT already has shopId — shop is confirmed, render dashboard
+      if (jwtShopId) {
         setIsChecking(false);
         return;
       }
 
-      // -------------------------------------------------------------
-      // PATH B: OWNER FLOW
-      // -------------------------------------------------------------
-      if (!shop) {
+      // JWT has no shopId — need to resolve which shop
+      // But if shop is already in store it means user already selected
+      // Just issue a fresh JWT for that shop
+      if (shop) {
         try {
-          const response = await api.get("/api/v1/auth/shops");
-          const shops = response.data.shops;
-
-          if (!shops || shops.length === 0) {
-            router.push("/login");
-            return;
-          }
-
-          if (shops.length === 1) {
-            setShop(shops[0]);
-
-            // Get fresh JWT with shopId populated
-            const switchResponse = await api.post("/api/v1/auth/switch-shop", {
-              shopId: shops[0].id,
-            });
-
-            setToken(switchResponse.data.accessToken);
-          } else {
-            router.push("/select-shop");
-            return;
-          }
+          const switchResponse = await api.post("/api/v1/auth/switch-shop", {
+            shopId: shop.id,
+          });
+          setToken(switchResponse.data.accessToken);
+          setIsChecking(false);
+          return;
         } catch {
-          // Error loading owner shops
+          // Switch failed — clear and re-evaluate
+          clearShop();
         }
-      } else {
-        // Check if current JWT contains shopId claim
-        try {
-          const payload = JSON.parse(atob(currentToken!.split(".")[1]));
-          if (!payload.shopId) {
-            const switchResponse = await api.post("/api/v1/auth/switch-shop", {
-              shopId: shop.id,
-            });
-            setToken(switchResponse.data.accessToken);
-          }
-        } catch {
-          // Could not parse JWT
+      }
+
+      // No shop in store and no shopId in JWT
+      // Fetch shops to determine what to do
+      try {
+        const response = await api.get("/api/v1/auth/shops");
+        const shops = response.data.shops;
+
+        if (!shops || shops.length === 0) {
+          router.push("/login");
+          return;
         }
+
+        if (shops.length > 1) {
+          // Multiple shops and none selected — go to selector
+          clearShop();
+          router.push("/select-shop");
+          return;
+        }
+
+        // Single shop — auto select
+        setShop(shops[0]);
+        const switchResponse = await api.post("/api/v1/auth/switch-shop", {
+          shopId: shops[0].id,
+        });
+        setToken(switchResponse.data.accessToken);
+      } catch {
+        // Could not fetch shops — continue anyway
       }
 
       setIsChecking(false);

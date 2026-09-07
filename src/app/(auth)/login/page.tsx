@@ -38,9 +38,16 @@ export default function LoginPage() {
     try {
       setError(null);
       const response = await api.post("/api/v1/auth/login", data);
-      const { accessToken, user, requiresShopSelection } = response.data;
+      const { accessToken, user, requireShopSelection } = response.data;
 
-      // Fetch shop details
+      // Owner with multiple shops - go to selector
+      if (requireShopSelection) {
+        setAuth(user, null, accessToken);
+        router.push("/select-shop");
+        return;
+      }
+
+      // Single shop owner or staff - fetch and auto select shop
       try {
         const shopsResponse = await api.get("/api/v1/auth/shops", {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -53,15 +60,13 @@ export default function LoginPage() {
       }
 
       // Redirect based on role
-      if (requiresShopSelection) {
-        router.push("/select-shop");
-      } else if (user.role === "CASHIER") {
+      if (user.role === "CASHIER") {
         router.push("/pos");
       } else {
         router.push("/dashboard");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message ?? "Invalid email or password");
+      setError(err.response?.data?.message ?? "Something went wrong");
     }
   };
 
