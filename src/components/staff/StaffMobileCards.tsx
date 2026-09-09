@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StaffMember } from "@/hooks/useStaff";
+import { useAuthStore } from "@/store/auth.store";
 
 interface StaffMobileCardsProps {
   staffList: StaffMember[];
@@ -30,6 +31,8 @@ export function StaffMobileCards({
   onEdit,
   onDelete,
 }: StaffMobileCardsProps) {
+  const { shop } = useAuthStore()
+
   return (
     <div className="grid grid-cols-1 divide-y md:hidden">
       {staffList.map((staff) => (
@@ -44,7 +47,7 @@ export function StaffMobileCards({
                   {staff.fullname}
                 </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                  <Store className="w-3 h-3" /> {staff.shopName}
+                  <Store className="w-3 h-3" /> {shop?.shopName ?? "Duka"}
                 </p>
               </div>
             </div>

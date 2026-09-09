@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { StaffMember } from "@/hooks/useStaff";
+import { useAuthStore } from "@/store/auth.store";
 
 interface StaffTableProps {
   staffList: StaffMember[];
@@ -35,6 +36,7 @@ interface StaffTableProps {
 }
 
 export function StaffTable({ staffList, onEdit, onDelete }: StaffTableProps) {
+  const { shop } = useAuthStore()
   return (
     <div className="hidden md:block">
       <Table>
@@ -87,7 +89,7 @@ export function StaffTable({ staffList, onEdit, onDelete }: StaffTableProps) {
                 <TableCell>
                   <div className="flex items-center gap-1.5 text-xs text-foreground font-medium">
                     <Store className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span>{staff.shopName}</span>
+                    <span>{shop?.shopName}</span>
                   </div>
                 </TableCell>
 
@@ -95,7 +97,7 @@ export function StaffTable({ staffList, onEdit, onDelete }: StaffTableProps) {
                   <Badge
                     variant="outline"
                     className={`text-[11px] font-semibold ${
-                      staff.role === "OWNER"
+                      String(staff.role) === "OWNER"
                         ? "bg-amber-500/10 text-amber-600 border-amber-500/30"
                         : staff.role === "ADMIN"
                           ? "bg-indigo-500/10 text-indigo-600 border-indigo-500/30"

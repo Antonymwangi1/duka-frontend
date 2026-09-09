@@ -45,8 +45,8 @@ export default function StaffPage() {
   };
 
   // Safe fallback counts during loading state
-  const totalCount = data?.pagination?.total ?? 0;
   const staffList = data?.staff ?? [];
+  const totalCount = staffList.length;
   const activeCount = staffList.filter((s) => s.isActive).length;
   const inactiveCount = staffList.filter((s) => !s.isActive).length;
 
