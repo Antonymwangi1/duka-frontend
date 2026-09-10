@@ -74,7 +74,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">
-            {greeting()}, {user?.fullname?.split(" ")[0]} 👋
+            {greeting()}, {user?.fullname?.split(" ")[0]}
           </h1>
           <p className="text-muted-foreground mt-1">
             Here is what is happening at {shop?.shopName} today
