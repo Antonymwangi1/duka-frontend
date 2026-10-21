@@ -22,6 +22,7 @@ interface AuthState {
   accessToken: string | null;
   isAuthenticated: boolean;
   _hasHydrated: boolean;
+  isAuthReady: boolean;
 
   setAuth: (user: User, shop: Shop | null, token: string) => void;
   setShop: (shop: Shop) => void;
@@ -29,6 +30,7 @@ interface AuthState {
   setToken: (token: string) => void;
   logout: () => void;
   setHasHydrated: (value: boolean) => void;
+  setAuthReady: (value: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -39,6 +41,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       isAuthenticated: false,
       _hasHydrated: false,
+      isAuthReady: false,
 
       setAuth: (user, shop, token) =>
         set({
@@ -49,14 +52,16 @@ export const useAuthStore = create<AuthState>()(
         }),
 
       setShop: (shop) => set({ shop }),
+
       clearShop: () => set({ shop: null }),
+
       setToken: (token) => set({ accessToken: token }),
 
       logout: () => {
-        // Clear localStorage completely
         if (typeof window !== "undefined") {
           localStorage.removeItem("duka-auth");
         }
+
         set({
           user: null,
           shop: null,
@@ -66,15 +71,20 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setHasHydrated: (value) => set({ _hasHydrated: value }),
+
+      setAuthReady: (value) => set({ isAuthReady: value }),
     }),
     {
       name: "duka-auth",
       storage: createJSONStorage(() => localStorage),
+
+      // Persist user/shop information, but never the access token.
       partialize: (state) => ({
         user: state.user,
         shop: state.shop,
         isAuthenticated: state.isAuthenticated,
       }),
+
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

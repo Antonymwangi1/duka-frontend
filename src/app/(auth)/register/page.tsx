@@ -85,11 +85,11 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterInput) => {
     try {
       setError(null);
-      const response = await api.post("/api/v1/auth/register", data);
+      await api.post("/api/v1/auth/register", data);
 
-      const { accessToken, user, shop } = response.data;
-      setAuth(user, shop, accessToken);
-      router.push("/dashboard");
+      router.push(
+        `/verify-email/pending?email=${encodeURIComponent(data.email)}`,
+      );
     } catch (err: any) {
       setError(
         err.response?.data?.message ??
