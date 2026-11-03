@@ -14,7 +14,7 @@ import { useAuthStore } from "@/store/auth.store";
 import api from "@/lib/axios";
 
 const LoginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -105,6 +105,7 @@ export default function LoginPage() {
               id="email"
               type="email"
               placeholder="name@example.com"
+              defaultValue="demo@example.com"
               className="pl-10 h-11 rounded-xl transition-all focus-visible:ring-2 focus-visible:ring-primary/20"
               {...register("email")}
             />
@@ -132,6 +133,7 @@ export default function LoginPage() {
               id="password"
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
+              defaultValue="Secret123"
               className="pl-10 pr-10 h-11 rounded-xl transition-all focus-visible:ring-2 focus-visible:ring-primary/20"
               {...register("password")}
             />
