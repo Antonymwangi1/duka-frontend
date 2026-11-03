@@ -91,8 +91,10 @@ export default function RegisterPage() {
         `/verify-email/pending?email=${encodeURIComponent(data.email)}`,
       );
     } catch (err: any) {
+      router.push(
+        `/verify-email/pending?email=${encodeURIComponent(data.email)}`,
+      );
       setError(
-        err.response?.data?.message ??
           "Registration failed. Please check your inputs.",
       );
     }
